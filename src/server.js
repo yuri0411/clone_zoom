@@ -10,11 +10,23 @@ app.use("/public", express.static(__dirname + "/public"));
 app.get("/", (req, res) => res.render("home"));
 app.get("/*", (req, res) => res.redirect("/"));
 
-const handleListen = () => console.log(`Listening on ws://localhost:3000 `);
+const handleListen = () => console.log(`Listening on http://localhost:3000 `);
 
 // http 서버애 access
 const server = http.createServer(app)
 // http 서버 위에 webSocket 서버를 만듬.
 const wss = new WebSocketServer({server});
+
+wss.on('connection', (socket) => {
+    // socket 연결된 브라우저
+    console.log('Connected to Browser')
+    socket.on('close', () => {
+        console.log('Disconnected from Browser')
+    })
+    socket.on('message', (message) => {
+        console.log('from browser message: ',message.toString('utf-8'))
+    })
+    socket.send('helloooooo!!!')
+})
 
 server.listen(3000, handleListen);
