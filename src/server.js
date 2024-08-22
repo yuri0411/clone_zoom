@@ -1,6 +1,6 @@
-import http from 'http'
+import http from "http";
 import { WebSocketServer } from "ws";
-import express from 'express';
+import express from "express";
 
 const app = express();
 
@@ -13,20 +13,21 @@ app.get("/*", (req, res) => res.redirect("/"));
 const handleListen = () => console.log(`Listening on http://localhost:3000 `);
 
 // http 서버애 access
-const server = http.createServer(app)
+const server = http.createServer(app);
 // http 서버 위에 webSocket 서버를 만듬.
-const wss = new WebSocketServer({server});
+const wss = new WebSocketServer({ server });
 
-wss.on('connection', (socket) => {
-    // socket 연결된 브라우저
-    console.log('Connected to Browser')
-    socket.on('close', () => {
-        console.log('Disconnected from Browser')
-    })
-    socket.on('message', (message) => {
-        console.log('from browser message: ',message.toString('utf-8'))
-    })
-    socket.send('helloooooo!!!')
-})
+const sockets = [];
+
+wss.on("connection", (socket) => {
+  sockets.push(socket);
+  console.log("Connected to Browser");
+  socket.on("close", () => {
+    console.log("Disconnected from Browser");
+  });
+  socket.on("message", (message) => {
+    sockets.forEach((anotherSocket) => anotherSocket.send(message.toString()));
+  });
+});
 
 server.listen(3000, handleListen);
