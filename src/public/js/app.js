@@ -17,6 +17,7 @@ socket.addEventListener("open", (e) => {
 // 서버에서 메세지를 받을 떼
 socket.addEventListener("message", (message) => {
   const li = document.createElement("li");
+  console.log(message);
   li.innerText = message.data;
   messageList.append(li);
 });
@@ -37,6 +38,7 @@ function handleNickSubmit(e) {
   e.preventDefault();
   const input = nickForm.querySelector("input");
   socket.send(makeMessage("nickname", input.value));
+  input.value = "";
 }
 messageForm.addEventListener("submit", handleSubmit);
 nickForm.addEventListener("submit", handleNickSubmit);
