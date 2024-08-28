@@ -2,6 +2,7 @@ import http from "http";
 // import { WebSocketServer } from "ws";
 import { Server } from "socket.io";
 import express from "express";
+import e from "express";
 
 const app = express();
 
@@ -17,7 +18,21 @@ const httpServer = http.createServer(app);
 const wsServer = new Server(httpServer);
 
 wsServer.on("connection", (socket) => {
-  console.log("Connected to Browser", socket);
+  socket.onAny((event) => {
+    console.log(`Socket Event: ${event}`);
+  });
+  socket.on("enter_room", (roomName, callback) => {
+    socket.join(roomName);
+    callback();
+    socket.to(roomName).emit("welcome");
+  });
+  socket.on("disconnecting", () => {
+    socket.rooms.forEach((room) => socket.to(room).emit("bye"));
+  });
+  socket.on("new_message", (message, room, callback) => {
+    socket.to(room).emit("new_message", message);
+    callback();
+  });
 });
 
 // const sockets = [];
