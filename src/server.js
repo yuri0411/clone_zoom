@@ -15,4 +15,12 @@ const handleListen = () => console.log(`Listening on http://localhost:3000 `);
 const httpServer = http.createServer(app);
 const wsServer = new Server(httpServer);
 
+wsServer.on("connection", (socket) => {
+  socket.on("join_room", (roomName, callback) => {
+    socket.join(roomName);
+    callback();
+    socket.to(roomName).emit("welcome");
+  });
+});
+
 httpServer.listen(3000, handleListen);
